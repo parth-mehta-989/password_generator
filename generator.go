@@ -1,10 +1,19 @@
+/*
+Package password_generator provides functionality to generate random passwords that meet a specified condition.
+
+The package includes a PasswordGenerator struct that holds the minimum condition for the generated password and the allowed special characters.
+The PasswordGenerator struct has a method Generate that generates a password that meets the minimum condition set in the PasswordGenerator.
+
+The generated password is a string that meets the minimum length, contains at least one uppercase letter, one lowercase letter, one number, and one special character.
+The length of the generated password is a random number between the minimum and maximum length specified in the PasswordGenerator.
+
+The package also includes a helper function NewGenerator that creates a new instance of the PasswordGenerator struct.
+*/
 package password_generator
 
 import (
 	"strings"
 
-	consts "github.com/parth_mehta_989/password_generator/src/constants"
-	"github.com/parth_mehta_989/password_generator/src/utils/random"
 	"github.com/pkg/errors"
 )
 
@@ -40,7 +49,7 @@ Returns:
 */
 func NewGenerator(conditions Conditions, allowedSpecialChars *string) *PasswordGenerator {
 	if conditions.MinLength == 0 {
-		conditions.MinLength = consts.DefaultMinLength
+		conditions.MinLength = defaultMinLength
 	}
 	if conditions.MinLength > conditions.MaxLength {
 		conditions.MaxLength = conditions.MinLength
@@ -61,12 +70,12 @@ func (p *PasswordGenerator) Generate() (*string, error) {
 		return nil, errors.Wrapf(err, "error satisfying minimum condition of one CAP, one lowercase, one number, and one special char")
 	}
 
-	specialCharList := consts.SpecialChars
+	specialCharList := specialChars
 	if p.allowedSpecialChars != nil {
 		specialCharList = *p.allowedSpecialChars
 	}
-	eligibleChars := strings.Join([]string{consts.UppercaseLetters, consts.LowercaseLetters, consts.Numbers, specialCharList}, "")
-	passLength, err := random.RandBetween(p.condition.MinLength, p.condition.MaxLength)
+	eligibleChars := strings.Join([]string{uppercaseLetters, lowercaseLetters, numbers, specialCharList}, "")
+	passLength, err := randBetween(p.condition.MinLength, p.condition.MaxLength)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error generating password length")
 	}
@@ -87,7 +96,7 @@ func (p *PasswordGenerator) Generate() (*string, error) {
 // Returns:
 //   - An error if the operation fails.
 func (p *PasswordGenerator) addOneChar(letters string) error {
-	index, err := random.RandomNumber(len(letters))
+	index, err := randomNumber(len(letters))
 	if err != nil {
 		return err
 	}
@@ -98,7 +107,7 @@ func (p *PasswordGenerator) addOneChar(letters string) error {
 
 // satisfyMinimumCondition ensures that the generated password meets the minimum condition set in the PasswordGenerator.
 //
-// It iterates over the character types (uppercase letters, lowercase letters, consts.Numbers, and special characters) and adds the required number of each type to the password.
+// It iterates over the character types (uppercase letters, lowercase letters, Numbers, and special characters) and adds the required number of each type to the password.
 //
 // Returns an error if the operation fails.
 func (p *PasswordGenerator) satisfyMinimumCondition() error {
@@ -106,9 +115,9 @@ func (p *PasswordGenerator) satisfyMinimumCondition() error {
 		chars string
 		count int
 	}{
-		{consts.UppercaseLetters, p.condition.MinUppercase},
-		{consts.LowercaseLetters, p.condition.MinLowercase},
-		{consts.Numbers, p.condition.MinNumber},
+		{uppercaseLetters, p.condition.MinUppercase},
+		{lowercaseLetters, p.condition.MinLowercase},
+		{numbers, p.condition.MinNumber},
 		{p.getSpecialChars(), p.condition.MinSpecialChar},
 	}
 
@@ -134,5 +143,5 @@ func (p *PasswordGenerator) getSpecialChars() string {
 	if p.allowedSpecialChars != nil {
 		return *p.allowedSpecialChars
 	}
-	return consts.SpecialChars
+	return specialChars
 }
