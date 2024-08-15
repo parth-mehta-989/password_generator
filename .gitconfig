@@ -1,0 +1,7 @@
+[core]
+	editor = code --wait
+[user]
+	name = parth-mehta-989
+	email = mparth989@gmail.com
+[push]
+	autoSetupRemote = true
