@@ -1,4 +1,5 @@
 # password_generator
+[![Go Reference](https://pkg.go.dev/badge/github.com/parth-mehta-989/password_generator.svg)](https://pkg.go.dev/github.com/parth-mehta-989/password_generator)
 
 Package `password_generator` provides functionality to generate random passwords that meet a specified condition.
 
