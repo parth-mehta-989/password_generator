@@ -51,8 +51,11 @@ func NewGenerator(conditions Conditions, allowedSpecialChars *string) *PasswordG
 	if conditions.MinLength == 0 {
 		conditions.MinLength = defaultMinLength
 	}
+	if conditions.MaxLength == 0 {
+		conditions.MaxLength = defaultMaxLength
+	}
 	if conditions.MinLength > conditions.MaxLength {
-		conditions.MaxLength = conditions.MinLength
+		conditions.MaxLength = conditions.MinLength + 1
 	}
 
 	return &PasswordGenerator{condition: conditions, allowedSpecialChars: allowedSpecialChars}
