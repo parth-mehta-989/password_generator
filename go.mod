@@ -1,4 +1,4 @@
-module github.com/parth_mehta_989/password_generator
+module github.com/parth-mehta-989/password_generator
 
 go 1.21.6
 
