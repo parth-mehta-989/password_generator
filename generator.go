@@ -54,7 +54,7 @@ func NewGenerator(conditions Conditions, allowedSpecialChars *string) *PasswordG
 	if conditions.MaxLength == 0 {
 		conditions.MaxLength = defaultMaxLength
 	}
-	if conditions.MinLength > conditions.MaxLength {
+	if conditions.MinLength >= conditions.MaxLength {
 		conditions.MaxLength = conditions.MinLength + 1
 	}
 
@@ -68,7 +68,14 @@ func NewGenerator(conditions Conditions, allowedSpecialChars *string) *PasswordG
 //
 // Returns a pointer to the generated password as a string and an error if the password generation fails.
 func (p *PasswordGenerator) Generate() (*string, error) {
+	passLength, err := randBetween(p.condition.MinLength, p.condition.MaxLength)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error generating password length")
+	}
+
 	p.builder = passBuilder{}
+	p.builder.Grow(int(passLength))
+
 	if err := p.satisfyMinimumCondition(); err != nil {
 		return nil, errors.Wrapf(err, "error satisfying minimum condition of one CAP, one lowercase, one number, and one special char")
 	}
@@ -78,10 +85,7 @@ func (p *PasswordGenerator) Generate() (*string, error) {
 		specialCharList = *p.allowedSpecialChars
 	}
 	eligibleChars := strings.Join([]string{uppercaseLetters, lowercaseLetters, numbers, specialCharList}, "")
-	passLength, err := randBetween(p.condition.MinLength, p.condition.MaxLength)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error generating password length")
-	}
+
 	for p.builder.Len() < int(passLength) {
 		if err := p.addOneChar(eligibleChars); err != nil {
 			return nil, errors.Wrap(err, "error adding random character")
@@ -103,7 +107,6 @@ func (p *PasswordGenerator) addOneChar(letters string) error {
 	if err != nil {
 		return err
 	}
-	p.builder.Grow(1)
 	p.builder.WriteByte(letters[index])
 	return nil
 }
